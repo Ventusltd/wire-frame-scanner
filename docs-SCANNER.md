@@ -25,3 +25,18 @@ The scanner must recover the pitch within 0.25 m and the direction within 1°, o
 - **Slanted rows.** The structure tensor alone was 3–5° off on slanted rows, because of pixel staircases. The brute-force sweep fixed that: 6/12 passed before, and 12/12 after the sweep was widened to ±8°.
 
 Everything the scanner draws from real imagery is labelled "estimated from imagery, not measured". The repository holds no imagery files. Tiles are fetched and cached locally under their providers' terms.
+
+## Filling what cannot be seen (procedural maths), with provenance on every field
+Every value in a site model carries a tag and its source:
+- **measured:** seen directly in imagery or GIS data. Examples: row direction, pitch, block outlines, fences, station footprints, tower positions, LiDAR heights.
+- **derived:** computed from measured values by exact geometry. Examples: tilt from measured table depth, pitch and latitude; table count from block area and pitch; MW from tables × module rating.
+- **estimated:** filled in by an engineering rule where nothing is visible. Examples:
+  - module size and rating from public datasheets;
+  - inverter size and count from MW and the stations seen;
+  - cable size from current and route length;
+  - trench depth and spacing from the cited standard clauses (BS 7671 and others, cited by number and clause only, never copied);
+  - soil thermal resistivity from the soil data;
+  - pulling tension from cable mass and route bends.
+- **assumed:** a stated default, used only when nothing better exists.
+
+The same pattern works for any structure. For example, a tower building: a few measured pins (footprint centre and radius, widest radius, LiDAR height, top cap), then a rule-shaped skeleton between them (a profile curve, floor rings, a diagrid). It is labelled "measured at these points, rule-shaped between".
