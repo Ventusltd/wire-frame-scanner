@@ -1,0 +1,22 @@
+name: scanner
+on:
+  push:
+    branches: ['scanner/**', 'cloud/**', 'build/**']
+  pull_request:
+  workflow_dispatch:
+jobs:
+  cpu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install numpy matplotlib
+      # CuPy is absent on the runner: each test runs NumPy only and reports the GPU comparison as n/a.
+      - name: Every tests/test_*.py script (exit 0 = pass)
+        run: |
+          set -e
+          for t in tests/test_*.py; do echo "== $t"; python "$t"; done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: scanner-png, path: '**/*.png', if-no-files-found: ignore }
