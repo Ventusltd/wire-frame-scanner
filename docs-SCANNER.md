@@ -7,6 +7,7 @@ The scanner uses measured, deterministic maths to turn imagery and GIS geometry 
 - **R2.** Within a block, rows are parallel. The row normal comes first from the row edges (the structure tensor). A brute-force sweep then refines it: ±8° in 0.1° steps, keeping the angle whose cross-row profile has the sharpest spectral peak.
 - **R3.** Rows are equally spaced. The pitch is the fundamental of the cross-row profile, limited to 4–15 m. The phase comes from that fundamental.
 - **R4.** Each row is a line at phase + k × pitch, clipped to the block.
+- **R5, the site tile (measured ground in).** The scanner reads measured ground only as it arrives: fixed 2,048 m lattice tiles in British National Grid, streamed where someone has arrived. That means one request per product per tile, at least 40 s apart and at most 16 a day per client. Only the derived wireframe and a receipt are kept, and nothing is downloaded in bulk. Rows are scanned from LiDAR only where the survey postdates the build. Otherwise the heights are pre-construction ground. The full rule, signed by three witnesses, is [docs/R5-SITE-TILE.md](docs/R5-SITE-TILE.md). Its pure maths and 40 proofs are in ventus-grid-engine (engine/site-tile.js).
 
 ## Known-answer tests (tests/test_known_answer.py)
 The tests build synthetic farms whose row direction and pitch are exact by construction:
