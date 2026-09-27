@@ -3,7 +3,8 @@
 For each fictional solar design, the design's tables are rasterised with fictional.solar_block_heights (0.25 m) and
 used as the site model's object heights; vlidar surveys it over rolling ground; core reads only DSM minus DTM > 1 m.
 Tolerances: pitch +/- 0.10 m, row direction +/- 0.5 deg (tightened from 0.25 m / 1 deg). The 12 m case uses 1.6 MW (12 rows):
-with only 8 rows (0.7 MW) the scanner read 12.19 m, a few-rows bias recorded for the known-answer work, not hidden here.
+with 8 rows (0.7 MW) the scanner read 12.19 m. Cause (docs/HARD-CASES.md): row_pitch rounds to the FFT grid step
+(n=1024 for blocks under ~128 m), not a few-rows effect; 12 rows spans enough for n=2048. Recorded, not hidden.
 
 Direction convention. fictional uses compass bearings (0 = +y, 90 = +x, clockwise); tables face azimuth_deg and
 rows run along compass azimuth_deg + 90. core.row_normal/refine_normal return the row NORMAL in image-x convention
