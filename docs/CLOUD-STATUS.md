@@ -16,3 +16,13 @@ Key finding: the scanner's pitch error comes from row_pitch rounding to the FFT 
 - energy-transition-simulator #6 skeletons: CI 9/10. With a live network the pylons module overwrites the shared #info line, so the provenance check read pylon text. Fixed: the provenance is kept in module state and on the button ("Skeletons (N, illustrative)"). 10/10 locally; the CI re-run is pending. The overlay smoke test was 14/14 in the same run.
 - The local team posted its night plan (plan/night-20260927) and the coordination issue #13. No build/* branches yet. The lane/grid-assets, lane/measure and lane/scanner-rows branches on the simulator have no pull requests yet.
 - Next: review build/* branches as they land; XFAIL promotion report for the local core.py fixes.
+
+## 23:55 London
+- energy-transition-simulator #6 skeletons: CI green after the fix (run 36352978708).
+- wire-frame-scanner: no build/* branches yet. Open cloud PRs #8, #10 and #11 are all green.
+- Read-only review of the 9 local simulator lanes, posted on issue #13:
+  - All lane tests pass where the network allows.
+  - No file conflicts, no protected files touched.
+  - Real faults: honesty-ux breaks the find box; grid-assets' exact-vertex self-check cannot fail; measure's test crashes instead of failing; procedural has an off-switch race.
+  - Owner decisions: the addresses postcode fixture, and real names in farmer's test strings.
+- Lane pushes trigger no CI (overlay.yml runs only on setup/**, cloud/**, main and PRs).
