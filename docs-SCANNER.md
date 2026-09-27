@@ -40,3 +40,13 @@ Every value in a site model carries a tag and its source:
 - **assumed:** a stated default, used only when nothing better exists.
 
 The same pattern works for any structure. For example, a tower building: a few measured pins (footprint centre and radius, widest radius, LiDAR height, top cap), then a rule-shaped skeleton between them (a profile curve, floor rings, a diagrid). It is labelled "measured at these points, rule-shaped between".
+
+## Virtual LiDAR (scanner/vlidar.py): the scanner run in reverse
+A site model (ground plus tilted tables) is surveyed by simulated laser pulses: a jittered scan pattern at a set number of points per m², with first and last returns and range noise. The pulses are gridded into a DSM and a DTM, like a real airborne survey.
+
+**Closed-loop test (tests/test_vlidar_loop.py).** The chain is model, then virtual LiDAR, then the scanner reading only DSM − DTM > 1 m, then back to rows.
+- **Result, 27 Sept 2026:** 4/4 pass, over 204,304 pulses per case on rolling ground.
+- **Accuracy:** direction within 0.1° and pitch within 0.03 m.
+- **Engines:** GPU and CPU agree exactly.
+
+This proves consistency. The truth test is the next step: comparing the virtual DSM with a real survey flown after a farm was built.
