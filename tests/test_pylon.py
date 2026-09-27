@@ -57,6 +57,22 @@ for v in (132, 275, 400):
         prov = all(m[k]['source'] == ASSUMED_SRC for k in ('height_top_m', 'base_width_m', 'waist_width_m', 'arm_lengths_m'))
         check(f"{tag} dimensions tagged assumed", prov)
 
+# Every dimension must be either explicitly assumed or carry a citation; an uncited 'cited'/'measured' value fails.
+_d = {k: v for k, v in __import__('scanner.pylon', fromlist=['_ASSUMED_DIMS'])._ASSUMED_DIMS[132].items()}
+for bad in ({'tag': 'cited'}, {'tag': 'measured', 'source': ''}, {'tag': 'cited', 'source': 'measured (cite source)'}):
+    try:
+        lattice_pylon(132, dims={**_d, **bad}); raised = False
+    except ValueError:
+        raised = True
+    check(f"uncited dims rejected {bad}", raised)
+_m = lattice_pylon(132, dims={**_d, 'tag': 'cited', 'source': 'EXAMPLE-STD cl. 1.2 (test fixture)'})[1]
+check("cited dims keep their citation", all(_m[k]['tag'] == 'cited' and _m[k]['source'].startswith('EXAMPLE-STD')
+      for k in ('height_top_m', 'base_width_m', 'waist_width_m', 'arm_lengths_m')))
+for v in (132, 275, 400):
+    _m = lattice_pylon(v)[1]
+    check(f"{v} kV every dimension assumed-or-cited", all(_m[k]['tag'] in ('assumed', 'cited', 'measured') and _m[k]['source']
+          for k in ('height_top_m', 'base_width_m', 'waist_width_m', 'arm_lengths_m')))
+
 hs = [lattice_pylon(v)[1]['height_top_m']['value'] for v in (132, 275, 400)]
 ws = [lattice_pylon(v)[1]['base_width_m']['value'] for v in (132, 275, 400)]
 check("heights ordered by voltage class", hs[0] < hs[1] < hs[2], f"(top {hs} m, base width {ws} m)")

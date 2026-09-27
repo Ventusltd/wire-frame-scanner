@@ -41,10 +41,10 @@ if __name__ == '__main__':
     except Exception:
         pass
     res = {n: run(m) for n, m in eng}
-    agree = len(eng) < 2 or all(a['got_bearing'] == b['got_bearing'] and a['got_pitch'] == b['got_pitch'] for a, b in zip(res['cupy'], res['numpy']))
+    agree = 'n/a (no GPU)' if len(eng) < 2 else all(a['got_bearing'] == b['got_bearing'] and a['got_pitch'] == b['got_pitch'] for a, b in zip(res['cupy'], res['numpy']))
     for n, rs in res.items():
         for r in rs:
             print(f"{n:5s} {'PASS' if r['pass'] else 'FAIL'}  model rows {r['bearing']:6.1f} deg {r['pitch']:5.2f} m  ->  scanner from virtual LiDAR {r['got_bearing']} deg {r['got_pitch']} m  ({r['points']} pulses)")
     k = eng[0][0]; npass = sum(r['pass'] for r in res[k])
     print(f"\n{k}: {npass}/{len(res[k])} closed-loop pass; GPU and CPU agree: {agree}")
-    sys.exit(0 if npass == len(res[k]) and agree else 1)
+    sys.exit(0 if npass == len(res[k]) and agree is not False else 1)

@@ -85,7 +85,12 @@ def lattice_pylon(voltage_class, bracing='K', n_arms_per_side=3, dims=None):
         src_tag, src = ASSUMED, ASSUMED_SRC
     else:
         d = dict(dims)
-        src_tag, src = d.pop('tag', ASSUMED), d.pop('source', ASSUMED_SRC)
+        src_tag, src = d.pop('tag', ASSUMED), d.pop('source', None)
+        if src_tag == ASSUMED:
+            src = src or ASSUMED_SRC
+        elif not (isinstance(src, str) and src.strip()) or 'cite source' in src:
+            # A dimension that is not assumed must carry its citation; never fall back to the assumed label.
+            raise ValueError(f'pylon dims tagged {src_tag!r} need a citation in source=')
     arm_len = list(d['arm_len'])
     if len(arm_len) != n_arms_per_side:
         arm_len = [arm_len[min(k, len(arm_len) - 1)] for k in range(n_arms_per_side)]
