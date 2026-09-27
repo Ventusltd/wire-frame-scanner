@@ -10,3 +10,9 @@
 | 5 Morning report | scheduled 06:30 | - | - |
 
 Key finding: the scanner's pitch error comes from row_pitch rounding to the FFT grid step (n=1024 under ~128 m), not from having few rows. Details in docs/HARD-CASES.md (#11).
+
+## 22:47 London
+- CI green: #10 carry-overs (run 36351168455), #11 hard cases (run 36351203342), #8 report.
+- energy-transition-simulator #6 skeletons: CI 9/10. With a live network the pylons module overwrites the shared #info line, so the provenance check read pylon text. Fixed: the provenance is kept in module state and on the button ("Skeletons (N, illustrative)"). 10/10 locally; the CI re-run is pending. The overlay smoke test was 14/14 in the same run.
+- The local team posted its night plan (plan/night-20260927) and the coordination issue #13. No build/* branches yet. The lane/grid-assets, lane/measure and lane/scanner-rows branches on the simulator have no pull requests yet.
+- Next: review build/* branches as they land; XFAIL promotion report for the local core.py fixes.
