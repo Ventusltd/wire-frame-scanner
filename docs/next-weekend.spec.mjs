@@ -296,6 +296,13 @@ export const STRUCTURES = {
     siteTrack: m('an unpaved construction track with tyre ruts along the array edge', '-', 'ESTIMATED', 'second mid-build photo; the temporary access the road kernel compares with a built road or mats'),
     buildStageSeen: m('after rafters, before purlins and modules', '-', 'MEASURED', 'what the photo shows'),
   },
+  terrainFollowing: {
+    sample: 'J (a hillside site mid-build, bare beam-system frames)',
+    rule: m('each frame sits on the ground at its own pile line, so a table curves along the row with the terrain', '-', 'ESTIMATED', 'hillside photo; the same rule as the site-world block-build (frame follows the ground per pile line)'),
+    kernelTest: m('every frame foot within 0.05 m of the DTM, and the change of slope between neighbouring frames within the structure limit', '-', 'DERIVED', 'from the rule'),
+    slopeLimit: m(null, '-', 'TO-SOURCE', 'the maximum slope along the row and the maximum change between frames, from the structure maker'),
+    accessTrack: m('an access track up the middle between two arrays, with a cable or hose laid along it', '-', 'ESTIMATED', 'hillside photo'),
+  },
   // THE BUILD SEQUENCE the construction game animates, from the site photos (each step a typed command and a state):
   buildSequence: ['set out the rows (survey)', 'drive posts (or place ballast blocks, or screw in ground screws)', 'fix longitudinal beams (beam systems) or rafters on the post heads', 'fix rafters on the beams (beam systems)', 'fix purlins along the row', 'clamp modules (a two-person lift, as in the tracker photo)', 'tie string cables along a purlin and drop them at the posts', 'set the inverter (under the table, or on its own stand at the row end)', 'dig the LV AC trench from the inverter and lay ducts and cables'],
   southTwinPostRafters: {
