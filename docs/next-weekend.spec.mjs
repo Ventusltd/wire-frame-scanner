@@ -138,6 +138,8 @@ export const RULES = {
     'Apply the grid scale factor and convergence; never assume grid north or grid metres.',
     'Lower DTM heights by d^2 / (2 R) when placing them in a flat local plane.',
     'Store GPU vertices relative to the origin in float32; fold the origin into the matrix in float64 before upload.',
+    'Distances: GridAtlas haversine (sphere, about 0.3 to 0.5 % from WGS84) stays for map-scale questions (substation to site, first-pass route length); construction uses place-frame (WGS84 tangent plane + OSTN15, 62/62 OS test points at 0.0078 m); CI checks kernel corners against an ellipsoid geodesic (Karney, GeographicLib, MIT) to 1 mm, and the geodesic azimuth minus the grid bearing must equal the convergence.',
+    'One shared distance/frame function: the sphere constant 6371008.8 is copied into 7 files today; replace them.',
   ],
   view: [
     'One close-up object at a time (the table or trench nearest the eye) at full detail; everything else instanced from the same template.',
