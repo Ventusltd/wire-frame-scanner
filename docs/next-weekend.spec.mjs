@@ -217,6 +217,11 @@ export const KERNEL = {
       compare: ['bearing and rutting vs CBR', 'mats needed and lay/lift days', 'hire vs build cost (inputs labelled)', 'farmland reinstatement: topsoil kept, no aggregate left'],
     },
   },
+  substation: {
+    sample: 'L (an outdoor substation at the edge of a large E-W farm)',
+    members: ['grid transformers in bays', 'busbar gantries and outdoor switchgear (AIS)', 'control buildings', 'the security fence', 'an overhead line coming in on lattice towers', 'an internal road'],
+    dims: m(null, '-', 'TO-SOURCE', 'bay widths, gantry heights, clearances and transformer sizes from a substation standard layout; the grid-building part of the simulator'),
+  },
   station: {
     uses: ['FACTS.station.*'],
     members: ['pad or piles', 'bund with pre-drilled entry holes (7 per side, scenario A)', 'skid', 'transformer', 'RMU', 'LV boards'],
@@ -295,6 +300,14 @@ export const STRUCTURES = {
     postFeet: m('a ring of crushed stone around each post foot (a pre-drilled hole backfilled, or a gravel collar)', '-', 'ESTIMATED', 'second mid-build photo; to confirm on site'),
     siteTrack: m('an unpaved construction track with tyre ruts along the array edge', '-', 'ESTIMATED', 'second mid-build photo; the temporary access the road kernel compares with a built road or mats'),
     buildStageSeen: m('after rafters, before purlins and modules', '-', 'MEASURED', 'what the photo shows'),
+  },
+  eastWestTentLandscape: {
+    sample: 'L (a large E-W farm abroad, drone view; a smaller version of the REPD 6502 tent)',
+    orientation: m('E-W tent, two faces back to back, low tilt', '-', 'ESTIMATED', 'drone photo'),
+    moduleOrientation: m('landscape (long side along the row)', '-', 'ESTIMATED', 'drone photo; REPD 6502 uses 5 in portrait per face'),
+    modulesUpSlope: m(null, '-', 'TO-SOURCE', 'landscape modules per face: about 4 to 6 read from the photo, to count on a sharper image'),
+    faceWidth: m('modulesUpSlope x module short side (1.13 to 1.30 m) x cos(tilt)', '-', 'DERIVED', 'the same kernel as the portrait tent with the module turned; about half the REPD 6502 width'),
+    stationsBetweenTables: m('small kiosks set in gaps between the tables', '-', 'ESTIMATED', 'drone photo'),
   },
   terrainFollowing: {
     sample: 'J (a hillside site mid-build, bare beam-system frames)',
