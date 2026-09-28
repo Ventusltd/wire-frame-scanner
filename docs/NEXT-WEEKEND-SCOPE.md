@@ -373,3 +373,97 @@ The under-table structure (posts, braces, purlins, rafters, rails) has no measur
 **Budget:** plan for two Fable builders per iteration with the GPU doing the checking. If the credit allows only one iteration, do iteration 1 whole.
 
 **Transformer unloading** (the lift plan and the station kernel) moves to the weekend after, unless iteration 3 finishes early.
+
+## 13. THE AGREED PLAN (supersedes section 12.3): argued with a Fable challenger, PLAN SOLD
+
+The direction on 28 Sept at 15:50: a first-person walk, and a dashboard to choose the table arrangement (portrait or landscape, modules per column, modules in series; fixed south, east-west as REPD 6502 (5P per face) or sample L (5L per face), or a tracker 1P or 2P), reusing the Kuiper 2D engine and its layout chooser. Round 1 made 10 objections; the lead conceded 10 with three pushbacks and five demands; round 2 ruled 14 of 15 items SOLD and sold item 9 with one change (plain solids in iteration 1, the hero look in iteration 3). The spec's ITERATIONS block is the agreed plan (22 pass tests, at most 24 agent-hours).
+
+
+The product for the weekend: the FPS walk and the layout dashboard, driving ONE table kernel on ONE ground.
+Cap 24 agent-hours; at most two Fable builders at once; scripted gates, no witness agents.
+Trench, roads, mats, fence and the lift go to the weekend after, with the kernel interfaces ready.
+No site names: "REPD 6502" and "sample L" only.
+
+## Rulings on the lead's ten answers
+
+1. SOLD. The dashboard driving one kernel is iteration 1; the 48-combination kernel matrix is its pass test.
+2. SOLD. 2P carries the cartridge's tube gap between tiers; rotation limit (55 deg seen) and stow (0) are parameters
+   labelled TO-SOURCE; tube height 1.7 m 1P ESTIMATED, 2.3 m 2P ASSUMED. Labels stay on until a maker source arrives.
+3. SOLD. structures.mjs FORMATS widened (the product's own copy). station.mjs is imported by URL and never copied.
+   One note, not a condition: station.mjs defaults are tilt 10 and height 1.2, so the 1 mm reconciliation test must
+   pass the REPD 6502 params explicitly (rows 5, columns 90, tilt 8, height 1.33, ridgeGap 0.5). Checked in the
+   0524 release: tableShape(:42) gives width 2 x depth + ridgeGap = 24.27 m with those numbers.
+4. SOLD. One ground first; the walk tests do not count until "wire ground vs queryTerrainElevation <= 0.05 m at
+   1,000 points" passes. The ground gate is rerun at the top of iteration 2.
+5. SOLD. Kernel output carries inverter position, string home-run points, pile list, aisle and corridor widths; the
+   test is sharpened to "present AND non-null" for every structure and preset (an empty field would pass "exists").
+6. SOLD. One kernel at prototype/mod/kernel/table.mjs; tables.js FARM and the toy block() go; the grep counts the
+   product's own code only, station.mjs by URL excepted.
+7. SOLD. The round 1 notes found the live /kuiper/ pointer still carries cartridge 202609200009 (no `fire string`);
+   the maths is in the i0097 dev build only. So the plan writes the port as the default path (header naming
+   009700000000-kuiper-programs.js:706-722 and BOXES :1102-1112; 20-case match test) and the URL import as a
+   one-curl check first, not a branch of work.
+8. SOLD.
+9. NOT SOLD as stated; sold with one change. The spec's reviewers put ground + hero table at 10 to 14 h; the lead
+   now caps iteration 1 at 9 h and adds the kernel and the dashboard to it. That only fits if the hero look
+   (12-edge prisms, module frames, rails, light slot, the explorer standard) leaves iteration 1. AGREED: iteration 1
+   draws plain solids (modules as boxes, posts and tubes as tubes); the hero close-up is iteration 3.
+   Hours: iteration 1 7-9 h, iteration 2 6-8 h, iteration 3 5-7 h; maximum 24.
+10. SOLD. Presets: REPD 6502 tent (5P per face, 24.27 m), sample L tent (5L per face, 13.49 m), a 2P tracker, and
+    the south fixed default.
+
+## Rulings on the five demands
+
+A. SOLD, and checked. protocol.js:107-114 holds coldVoc, hotVmp, coldVmp and the checks against maxVoltage,
+   minMpptVoltage and maxMpptVoltage. With the DEFAULT module (voc 45.9 V, betaVoc -0.25 %/K) at -10 C:
+   30 in series = 1,497.5 V, accepted against 1,500 V; 31 = 1,547.4 V, refused; hot Vmp at 70 C = 988.7 V,
+   above the 500 V minimum. The test now asserts both 30 and 31 so it discriminates, not just "matches".
+B. SOLD (see 4).
+C. SOLD. the direction's engines are the standard: station.mjs reconciled to 1 mm for the REPD 6502 preset; the
+   explorer (graphics-engines-open-source) is the look for the hero close-up in iteration 3.
+D. SOLD. Kernel output in local ENU metres anchored per table; join under 1 mm within 50 m (the audit shows
+   0.0005 m at 50 m for one Mercator anchor, so the gate is achievable); 0 infeasible bends is the trench gate for
+   the weekend after and stays in the spec's GATES.
+E. SOLD. Two Fable builders at most; the GPU runner runs the matrix; gates are scripts.
+
+## PLAN SOLD
+
+Sold once item 9 is taken as written above (plain solids in iteration 1, hero look in iteration 3).
+
+## The three iterations (the code is in iterations-agreed.mjs; checked against the spec's self-check: gaps 0)
+
+### Iteration 1 (7-9 h): ONE ground, ONE kernel, ONE dashboard
+- EA 1 m DTM as terrarium tiles and the map terrain; wire grounded per vertex; t.async = false.
+- prototype/mod/kernel/table.mjs: buildTable(params) -> solids (box | tube | prism), dims, labels, inverter,
+  homeRuns, piles, widths; local ENU metres anchored at the table centre. Parameters: mounting fixed | east-west |
+  tracker; orientation portrait | landscape; modulesUpSlope 1..6 per face; faces; modulesInSeries 1..60; bayModules;
+  postLinesPerFace; tilt; lowEdge; rotationLimitDeg; stowDeg; tubeHeight; the 2P tube gap.
+- Series is electrical: Kuiper BOXES as the dashboard schema, validate() ranges, the three voltage checks live; an
+  illegal count is refused with the numbers shown.
+- station.mjs by URL as the reference; structures.mjs FORMATS widened; FARM and block() deleted.
+- Tests: terrarium decode 0.03 m; one ground 0.05 m at 1,000 points; reconcile station.mjs to 0.001 m; the 48-way
+  kernel matrix on the GPU runner; series electrical (30 accepted, 31 refused); feet on ground; dashboard drives
+  kernel in GPU Chrome; baseline.
+- Cut if short: the sample L preset and the stow parameter. Never the one-ground, reconciliation or series tests.
+
+### Iteration 2 (6-8 h): walk it
+- walk-fps.js: WALK about 10 m/s, RUN 33 m/s, pitch cap removed, kneel (eye 1.0 m); collision against kernel posts
+  and table solids; phone stick and gyro look; every measured row instanced from the kernel, placed per pile.
+- Tests: ground gate rerun; speeds from the URL position delta; 0 pass-throughs on 20 posts; look-up coverage
+  >= 90 %; kneel 1.0 m; 10,000 pile feet <= 0.05 m; 90 fps at 4K and 60 fps on the phone profile.
+- Cut if short: gyro look and the phone stick. Never the ground gate, collision or speeds tests.
+
+### Iteration 3 (5-7 h): the hero close-up, the join rule, CI, the interfaces
+- Hero tier from the same kernel output at the explorer standard; envelope.js join checked at 50 m; per-table JSON
+  of inverter, homeRuns, piles and widths for the weekend-after kernels; the kernel, reconciliation, series and walk
+  tests in CI on the self-hosted GPU runner (matrix <= 12, 0 tolerated); a checked version pinned.
+- Tests: hero dimensions (24.27 and 13.49 +/- 0.01, ridge 3.00, low edge 1.33); hero look passed by the direction,
+  not an agent; join < 0.001 m within 50 m; interfaces non-null for every structure; one engine (grep); GPU CI
+  green under 15 min; baseline.
+- Cut if short: the tracker clamps, then the homepage pin. Never the join or interfaces tests.
+
+## Open items carried, labelled
+- TO-SOURCE: tracker rotation range, stow and drive-post spacing; member sections and spacings; the mounting GA.
+- ESTIMATED: tube height 1.7 m (1P). ASSUMED: 2.3 m (2P).
+- walk-fps.js today: WALK 1.4, RUN 6, PMAX 85 (round 1 notes); the direction's values replace them in iteration 2.
+
