@@ -228,54 +228,90 @@ export const GATES = [
 ];
 
 // ------------------------------------------------------------------------------------------------ the three iterations
+// MERGED from three independent reviews (the lead, reviewer 1 geometry, reviewer 2 engineering), each through the GPU
+// three times. All three agree: precision is sound (0.003 to 0.0076 px at z22-24); what breaks is the GROUND (one
+// height per block anchor: 2.7 m p50, 8.6 m p95 on the farm DTM; two terrain sources), the CAMERA (pitch cap 85),
+// the MEMBERS (hairlines), the TRENCH (sharp corners) and SPRAWL (three table libraries). The order is binding.
 const t = (name, cmd, threshold) => ({ name, cmd, threshold });
 export const ITERATIONS = [
   {
-    id: 1, goal: 'The envelope and ONE table, mm accurate, from drone to under the table, on a phone',
-    files: ['prototype/mod/envelope.js', 'prototype/mod/kernel/table.mjs', 'tests/envelope.cjs', 'tests/kernel-table.cjs'],
-    tests: [
-      t('table dimensions', 'node tests/kernel-table.cjs', 'every dimension = FACTS/library to 1 mm; labels present'),
-      t('join check points', 'GPU Chrome: 3 check points (pad corner, table corner, trench end) placed and read back', '<= 1 mm vs float64 truth'),
-      t('on the satellite', 'offs.cjs + prof.py at z19.3 top-down', 'outline within 1.0 m of the satellite row edges'),
-      t('still-camera jitter', 'GPU Chrome, camera still at 1.7 m eye, 60 frames', 'every vertex within 0.5 px'),
-      t('flight without breaking', 'record drone z16 pitch 60 -> 1.7 m eye under the table', 'no frame changes > 10 % of pixels'),
-      t('look up', 'ArrowUp / drag under the table', 'pitch changes >= 10 deg; module undersides in view'),
-      t('frame rate', 'fps4k.cjs and the phone profile', '>= 90 at 4K, >= 60 phone, 0 errors'),
+    id: 1, goal: 'ONE ground and ONE hero table: from the satellite to under the table without breaking',
+    build: [
+      'EA 1 m DTM served as terrarium tiles (furnace service route /terrarium/{z}/{x}/{y}.png; 0xFFFF no data) and used as the map terrain, so satellite drape and wire share one ground',
+      'overlay.html loader: t.async = false (module order by design, not luck)',
+      'base wire grounded per vertex, not per block anchor',
+      'tables.js HERO tier: the nearest table gets solid members (12-edge prisms), module frames, rails, ridge light slot; its own anchor at the table centre',
+      'walk-fps.js: tables are solid for collision; a kneel key (eye 1.0 m)',
     ],
-    sees: 'His photo rebuilt: standing under a real table, looking along the aisle, the light slot above.',
-    agentHours: m(3, 'h', 'ASSUMED', 'one Fable modeller plus scripted gates'),
-    cutIfShort: 'the cell grid texture (keep module frames)',
+    files: ['prototype/overlay.html', 'prototype/mod/tables.js', 'prototype/mod/walk-fps.js', 'furnace service (terrarium route)', 'tests/hero-table.cjs'],
+    tests: [
+      t('terrarium decode', 'decode 1,000 random nodes vs the u16 DTM tile', '<= 0.03 m'),
+      t('one ground', 'wire ground vs map.queryTerrainElevation at 1,000 points', '<= 0.05 m (today p95 1 to 8 m)'),
+      t('zoom sweep', 'z15 to z22.75 in 0.25 steps, screenshot each; 4 table corners vs CPU projection', '<= 0.5 px'),
+      t('feet on ground', 'hero table feet vs EA DTM', '<= 0.05 m, 0 floating'),
+      t('dimensions', 'node tests/hero-table.cjs', 'width 24.27 +/- 0.01, ridge 3.00, low edge 1.33 m'),
+      t('frame rate', 'fps4k.cjs with hero + 80 detail tables', '>= 90 fps at 4K'),
+      t('baseline', 'overlay-smoke + privacy scan', '14/14, 0 hits'),
+    ],
+    sees: 'The farm photo, one table on its row; zooming in it becomes a real frame you walk under, on the ground the photo sits on.',
+    agentHours: m([10, 14], 'h', 'ESTIMATED', 'reviewers 1 and 2'),
+    cutIfShort: 'kneel key and rails; NEVER the one-ground, zoom-sweep or feet tests',
   },
   {
-    id: 2, goal: 'ONE trench and ONE road (or mat road), actual, and the first typed build loop',
-    files: ['prototype/mod/kernel/trench.mjs', 'prototype/mod/kernel/road.mjs', 'prototype/mod/kernel/mats.mjs', 'prototype/mod/phases.js', 'tests/kernel-trench.cjs', 'tests/kernel-road.cjs', 'tests/phases.cjs'],
-    tests: [
-      t('trench section', 'node tests/kernel-trench.cjs vs Python trench_section', 'width and depth equal to 1 mm for 1, 5, 7, 17 ducts'),
-      t('bends feasible', 'GPU audit bend test on the built route', '0 bends tighter than the governing radius'),
-      t('on the ground', 'trench top vs lidar-stream heightAt', '<= 2 cm along the segment'),
-      t('road layers', 'node tests/kernel-road.cjs vs a hand calculation', 'thickness and quantities within 1 %'),
-      t('swept path', 'design vehicle along the centreline', 'envelope stays on the road'),
-      t('build loop', 'typed dig, lay duct, pull cable, backfill, build road', 'phases play in order; quantities update'),
+    id: 2, goal: 'Look up, and ONE trench dug on real ground',
+    build: [
+      'MapLibre 5 (pitch beyond 90 in Walk; transform.elevation replaced by the 5.x API)',
+      'one-close-up LOD by pixels: hero when a post exceeds 1 px, detail when a table exceeds 65 px, outlines beyond',
+      'perf.js folded into ONE wire render (one program, one block draw site)',
+      'one trench chain with filleted bends (R >= governing duct radius where it fits; bends that cannot fit listed and drawn red), floor at DTM - 1.202 m, the section at the walker with the real duct count',
     ],
-    sees: 'A trench dug, ducted, cabled and backfilled, and a road built in layers, beside the table.',
-    agentHours: m(4, 'h', 'ASSUMED', 'two Fable modellers in parallel'),
-    cutIfShort: 'the mat road animation (keep its quantities)',
+    files: ['package.json', 'prototype/overlay.html', 'prototype/mod/walk-fps.js', 'prototype/mod/perf.js (folded)', 'prototype/mod/tables.js', 'prototype/mod/ac-trenches.js', 'prototype/mod/trench-measure.js', 'tests/trench-geometry.cjs'],
+    tests: [
+      t('look up', 'under the table, view axis coverage of hero members within 15 m', '>= 90 % (today 15 %)'),
+      t('no regressions', 'every browser test on 5.x on a real GPU', 'all pass'),
+      t('one render', 'grep wire programs and block draw sites', '1 and 1'),
+      t('invisible LOD', 'consecutive screenshots across a LOD swap', '< 0.5 % pixels changed'),
+      t('trench floor', 'floor vs DTM - 1.202 m along the chain', '<= 0.01 m'),
+      t('trench volume', 'swept volume vs GPU raster volume', 'within 1 %'),
+      t('clear of tables', 'chains vs table footprints', '0 crossings'),
+    ],
+    sees: 'Under the table you tilt up to the purlins, module undersides and the light slot; then walk one AC trench from a table to its station, dug into the real ground.',
+    agentHours: m([12, 16], 'h', 'ESTIMATED', 'reviewers 1 and 2'),
+    cutIfShort: 'row-detector deletions and the X-ray view; NEVER the upgrade or the fillets. Fallback: if MapLibre 5 cannot walk at 90 fps, build the separate envelope scene (ARCH.views.envelope) against the same tests',
   },
   {
-    id: 3, goal: 'The procedural block and the station with transformer unloading',
-    files: ['prototype/mod/kernel/station.mjs', 'instancing in prototype/mod/envelope.js', 'tests/kernel-station.cjs'],
-    tests: [
-      t('block from templates', 'build a 10 MVA block by typed phases', 'tables, trenches, roads and station all from kernel templates'),
-      t('draw calls', 'renderer info', '< 50'),
-      t('phone frame rate', 'phone profile', '>= 60 fps'),
-      t('lift plan', 'kernel-station test', 'radius and exclusion zone drawn and checked against the pad'),
-      t('hand-off', 'fly in and out of the envelope', 'pose kept to 0.1 m and 0.5 deg'),
+    id: 3, goal: 'The construction envelope, the procedural site from the hero template, roads, and CI on the GPU',
+    build: [
+      'site-box.js: fence-line envelope in one ENU frame, re-anchored every 250 m, the RULES.join rule',
+      'every measured row instanced from the hero template, placed per pile on the DTM by the site-world block-build rule (frame follows the ground per pile line)',
+      'ONE table library pinned by URL; delete the mod/engine/ copy and the toy block()',
+      'road kernel for the design vehicles (build-up, quantities, swept path) and the temporary mat option',
+      'the GPU audit plus the reviewers\' checks in CI on a self-hosted GPU runner (matrix <= 12), 0 tolerated tests',
+      'furnace guards (earthworks outside the site answers "not covered"; every job answered or refused)',
+      'a checked version pinned on the homepage with the audit JSON sha',
     ],
-    sees: 'A block built from nothing by typed phases, walkable, with a transformer lifted onto its pad.',
-    agentHours: m(4, 'h', 'ASSUMED', 'two Fable modellers'),
-    cutIfShort: 'the lift animation (keep the envelope drawing)',
+    files: ['prototype/mod/site-box.js', 'prototype/mod/tables.js', 'prototype/mod/engine-lock.js', 'prototype/mod/kernel/road.mjs', 'prototype/mod/kernel/mats.mjs', '.github/workflows/overlay.yml', 'tests/geometry-ci.py', 'tests/instances.cjs'],
+    tests: [
+      t('join', 'site-box check points at 250 m', '< 15 mm'),
+      t('pile feet', '10,000 feet vs DTM', '<= 0.05 m'),
+      t('fit to the photo', 'top-down render vs satellite', 'IoU >= baseline + 0.10; edge residual p50 < 1.0 m'),
+      t('solid tables', 'GPU audit', 'overlaps 0 m2 (today 913); aisles under 1 m 0 (today 27)'),
+      t('one engine', 'grep engine import URLs', 'exactly 1'),
+      t('GPU CI', 'self-hosted runner workflow', 'green in < 15 min, 0 tolerated'),
+      t('scale', '639 instances at 4K', '>= 90 fps, one draw call per LOD tier'),
+    ],
+    sees: 'A fenced construction site cut into the satellite; every table the one approved, on measured ground; roads with layers and quantities; a CI page with the numbers.',
+    agentHours: m([10, 18], 'h', 'ESTIMATED', 'reviewers 1 and 2'),
+    cutIfShort: 'in order: the DSM-hillshade lock test, the mat animation, the fence animation. Transformer unloading moves to the weekend after unless this finishes early',
   },
 ];
+
+export const REVIEWS = {
+  lead: { verdict: m([35, 40], '%', 'ESTIMATED', 'play test pillars, 12 scores'), where: 'docs/NEXT-WEEKEND-SCOPE.md sections 1-11' },
+  reviewer1: { lens: 'geometry and rendering', verdict: m(35, '%', 'ESTIMATED', 'three furnace iterations'), key: m(0.0076, 'px', 'MEASURED', 'worst anchor-relative error at 4K, z24') },
+  reviewer2: { lens: 'engineering truth and process', verdict: m([25, 30], '%', 'ESTIMATED', 'three furnace iterations'), key: m({ p50: 2.73, p95: 8.55, max: 10.87 }, 'm', 'MEASURED', 'one terrain height per 200 x 120 m block vs the farm DTM') },
+  openRisk: m(null, '-', 'TO-SOURCE', 'the mounting structure GA drawing (or maker and model): no satellite or LiDAR sees posts, braces, purlins or rails'),
+};
 
 // ------------------------------------------------------------------------------------------------ carried faults
 const f = (id, repro, observed, expected) => ({ id, repro, observed, expected });
@@ -295,13 +331,24 @@ export const FAULTS = [
   f('F13', 'engine lock at 1920x1080', 'its caption overlaps the tables caption', 'no overlap'),
   f('F14', 'GPU solids trench width', '125 / 1,475 mm (no side margins)', '325 / 1,675 mm'),
   f('F15', 'CI on main', 'two menu-bar checks and plan-view tolerated', 'all green on a GPU runner'),
+  f('F16', 'any block on sloping ground', 'one terrain height per block anchor: 2.73 m p50, 8.55 m p95 off the DTM', 'ground per vertex'),
+  f('F17', 'compare the satellite drape with the wire ground', 'AWS 4.8 m DEM vs EA 1 m DTM: two grounds', 'one ground (EA DTM as the map terrain)'),
+  f('F18', 'overlay.html module loader', 'dynamic scripts async, order by luck', 't.async = false'),
+  f('F19', 'walk into a table', 'tables.js and engine-lock blocks are not solid', 'collision with every table'),
+  f('F20', 'grep table libraries', 'mod/engine/ v12 copy, releases 0524 and 1853, toy block()', 'one library by URL'),
+  f('F21', 'tests asserting source text', '11 checks regex the module source', 'geometry assertions'),
+  f('F22', 'CI overlay.yml', 'SwiftShader; 4 of 14 test files tolerated', 'GPU runner, 0 tolerated'),
+  f('F23', 'tables.js FARM pitch', '26.77 m (24.27 + 2.5)', 'fitted 26.5 to 26.6 m (row gap about 2.3 m)'),
+  f('F24', 'furnace earthworks outside the site', 'crash: Index 0 is out of bounds', 'answer "not covered"'),
+  f('F25', 'furnace layout job', 'consumed, never answered in 8 minutes', 'answered or refused'),
+  f('F26', 'scanner-rows.js local()', 'comment claims < 0.1 %; measured 0.35 % per km east', 'one frame (place-frame) everywhere'),
 ];
 
 // ------------------------------------------------------------------------------------------------ how to continue
 export const CONTINUE = [
   '1. Read docs/NEXT-WEEKEND-SCOPE.md, then this file, then audit/GEOMETRY-AUDIT.md.',
   '2. Clone the simulator main; run the gates once to get the baseline (GATES).',
-  '3. Iteration 1: build envelope.js with the join rule first, prove the 3 check points to 1 mm, then the table kernel.',
+  '3. Iteration 1 (merged plan): one ground first (EA DTM as the map terrain, wire grounded per vertex, t.async = false), prove the one-ground and zoom-sweep tests, then the hero table tier.',
   '4. Push to main only when the gates pass; the CD loop ships a dated version; pin a checked version to the homepage at the end of each iteration.',
   '5. After each iteration rerun the GPU audit and update audit/GEOMETRY-AUDIT.md and this spec (FACTS gain values, TO-SOURCE items shrink).',
 ];
@@ -311,9 +358,9 @@ if (import.meta.url === `file://${process.argv[1].replace(/\\/g, '/').replace(/^
   const gaps = []; let n = 0;
   const walk = (o, p) => { if (o && typeof o === 'object' && 'label' in o && 'unit' in o) { n++; for (const k of ['value', 'unit', 'label', 'source']) if (!(k in o)) gaps.push(`${p}.${k}`); if (o.value == null && o.label !== 'TO-SOURCE') gaps.push(`${p}: null value not TO-SOURCE`); return; }
     if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) walk(v, `${p}.${k}`); };
-  walk({ FACTS, AUDIT, KERNEL }, 'spec');
+  walk({ FACTS, AUDIT, KERNEL, REVIEWS, IT: ITERATIONS.map(i => i.agentHours) }, 'spec');
   for (const it of ITERATIONS) for (const x of it.tests) for (const k of ['name', 'cmd', 'threshold']) if (!x[k]) gaps.push(`iteration ${it.id} test ${x.name}: ${k}`);
-  const toSource = JSON.stringify({ FACTS, KERNEL }).match(/"TO-SOURCE"/g)?.length || 0;
+  const toSource = JSON.stringify({ FACTS, KERNEL, REVIEWS }).match(/"TO-SOURCE"/g)?.length || 0;
   console.log(`${n} measurements, ${ITERATIONS.reduce((a, i) => a + i.tests.length, 0)} pass tests, ${FAULTS.length} faults, ${GATES.length} gates, ${toSource} TO-SOURCE items; gaps ${gaps.length}`);
   if (gaps.length) { console.log(gaps.join('\n')); process.exit(1); }
 }

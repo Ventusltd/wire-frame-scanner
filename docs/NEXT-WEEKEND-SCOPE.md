@@ -268,5 +268,108 @@ Each iteration ships as dated versions on main through the CD loop, with a check
 - **Budget:** two Fable agents per round at most, each on a timebox, with scripted gates instead of extra witness agents.
 - **Privacy:** no site names on screen or in public files. No private documents, imagery or point clouds in public repos.
 
-## 12. The merged plan (after the reviewers and the furnace)
-To be appended below.
+## 12. The merged plan: three independent reviews through the furnace
+Three reviews were written independently, and each put its claims through the GPU three times:
+- the lead's (sections 1 to 11, with the audit);
+- **Reviewer 1** (geometry and rendering): about 35 %;
+- **Reviewer 2** (engineering truth and process): 25 to 30 %.
+
+### 12.1 What all three agree on, measured
+- **Precision is sound: keep it.** Anchor-relative float32 with the anchor folded into a float64 matrix errs by 0.003 px (Reviewer 2) to 0.0076 px (Reviewer 1) at z22 to z24, pitch 85. Absolute float32 would be 18 px at p50 and 1,499 px at max. So the geometry does NOT break from precision; the audit's section 1 is the rule for any new layer.
+- **What really breaks when you zoom in:**
+  1. **The ground.**
+     - The base overlay takes ONE terrain height per block (`overlay.html` wire.render, `queryTerrainElevation` at the anchor). On the farm's DTM, a 200 x 120 m block is 2.7 m out at p50 and 8.6 m at p95 (Reviewer 2).
+     - The satellite is draped on a 4.8 m AWS DEM while the wire stands on the 1 m EA DTM (Reviewer 1: median 0.49 m, p95 8 m on a test tile; Reviewer 2: p50 0.10 m, p95 0.98 m at the farm).
+     - **Two grounds, and a block that ignores both between its corners.**
+  2. **The camera.** MapLibre 4.7.1 caps pitch at 85 deg (`walk-fps.js` PMAX 85), so the view axis reaches only 15 % of the members above you under a table. MapLibre 5 allows pitch beyond 90.
+  3. **The members.** Posts, braces, purlins and rafters are single dashed hairlines (`tables.js` 181-206). A 100 mm post at 2 m is 143 px wide at 4K.
+  4. **The trench.** Ducts are drawn with sharp corners. In case A4 the largest radius that fits every bend is 0.633 m, and 116 bends fail at 2.0 m.
+- **Sprawl:**
+  - three table libraries in one page: `mod/engine/` (a v12 copy of 45 files), release 202609270524 (engine-lock), release 202609271853 (tables.js), plus the overlay's own toy `block()`;
+  - three generations of rows-from-satellite;
+  - five local-frame conventions, and a 0.5 m cell-centre mismatch against the furnace lattice;
+  - 4 shader programs and 9 draw sites.
+- **The module loader works by luck.** Dynamically inserted scripts are async, but the order matters. The one-line fix is `t.async = false`.
+- **CI is not the gate it claims to be.**
+  - It runs on SwiftShader, not a real GPU.
+  - 4 of 14 test files are tolerated red.
+  - 11 checks assert regexes on the module's own source (they test text, not geometry).
+  - The 50 self-hosted GPU runners are unused.
+- **Labels:** "MEASURED row runs" should read "measured from imagery, relative". The provider georeference is 8.47 m.
+- **Pitch:** the code's 26.77 m (24.27 + 2.5) against the fitted 26.5 to 26.6 m (FFT 26.53, S01 26.59, vLiDAR 26.52). The 2.5 m row gap should be a fitted 2.3 m. That 0.24 m per row is the column drift the tables witness caught.
+- **The furnace needs guards:** `earthworks` crashes on a box outside the site, and a `layout` job was consumed and never answered.
+- **Process cost:** about 3 agent-hours per 100 merged lines last night. At 6 % credit, the GPU runner and the furnace must do the checking, not witness agents.
+
+### 12.2 The one open risk nobody can measure from the air
+The under-table structure (posts, braces, purlins, rafters, rails) has no measurement source: no satellite or LiDAR sees it. Without the mounting system maker's general arrangement drawing, or a scaled site photo, those members stay ASSUMED in exactly the place the viewer looks. **Decision needed: the mounting structure drawing (or the maker and model) for the reference table.**
+
+### 12.3 The three iterations for next weekend (merged; the order is binding, the cuts are listed)
+
+**Iteration 1: ONE ground, ONE hero table. From the satellite to under the table without breaking.**
+- **Build:**
+  - the EA 1 m DTM served as terrarium tiles (a route on the furnace service), so the map's terrain, the satellite drape and the wire stand on the same measured ground;
+  - `t.async = false` in the loader;
+  - the base wire grounded per vertex, not per block anchor;
+  - a HERO tier in `tables.js`: the table nearest the eye gets solid members (12-edge prisms), module frames, rails and the ridge light slot, with its own anchor at the table centre;
+  - walk collision includes the tables;
+  - a kneel key (eye at 1.0 m).
+- **Pass tests:**
+  1. decoded terrarium heights within 0.03 m of the DTM at 1,000 nodes;
+  2. wire ground within 0.05 m of `queryTerrainElevation` at 1,000 points (today p95 1 to 8 m);
+  3. zoom sweep z15 to z22.75 in 0.25 steps: the four table corners' pixels within 0.5 px of the CPU projection;
+  4. the table's feet within 0.05 m of the DTM, 0 floating;
+  5. width 24.27 +/- 0.01, ridge 3.00, low edge 1.33 m unchanged;
+  6. 4K at least 90 fps with the hero plus 80 detail tables;
+  7. smoke 14/14 and the privacy scan clean.
+- **You see:** the farm photo, one table on its row, and as you zoom it becomes a real frame you walk under, on the same ground the photo sits on.
+- **Cut if short:** the kneel key and rails. Never cut tests 2, 3 or 4.
+
+**Iteration 2: look up, and ONE trench dug on real ground.**
+- **Build:**
+  - MapLibre 5 (pitch beyond 90 in Walk; `transform.elevation` replaced by the 5.x API);
+  - the one-close-up LOD by pixels (hero when a post exceeds 1 px, detail when a table exceeds 65 px, outlines beyond);
+  - perf.js folded into ONE wire render;
+  - one trench chain with filleted bends (R at least the governing duct radius where it fits; every bend that cannot fit listed and drawn red), the floor at DTM minus 1.202 m, and the section at the walker with the real duct count.
+- **Pass tests:**
+  1. under the table the view axis reaches at least 90 % of hero members within 15 m (today 15 %);
+  2. every existing browser test passes on 5.x on a real GPU;
+  3. one wire program, one block draw site;
+  4. the LOD swap changes under 0.5 % of pixels;
+  5. the trench floor on the DTM to 0.01 m along the chain;
+  6. the swept volume equals the GPU raster volume within 1 %;
+  7. 0 chains across a table.
+- **You see:** under the table you tilt up to the purlins, the module undersides and the light slot; you then walk one AC trench from a table to its station, dug into the real ground profile.
+- **Cut if short:** the deletions of the old row detectors, and the X-ray view. Never cut the upgrade or the fillets.
+- **Fallback:** if MapLibre 5 cannot hold eye-level walking at 90 fps, build the separate envelope scene of section 4 instead. The pass test is the same.
+
+**Iteration 3: the construction envelope, the procedural site, roads, and CI on the GPU.**
+- **Build:**
+  - `site-box.js`: the fence-line envelope in one ENU frame, re-anchored every 250 m, with the joining rule;
+  - every measured row gets an instance of the hero template, placed per pile on the DTM by the site-world block-build rule (the frame follows the ground per pile line);
+  - ONE table library pinned by URL, with the `mod/engine/` copy and the toy `block()` deleted;
+  - a road kernel for the design vehicles (build-up, quantities, swept path) and the temporary mat option;
+  - the GPU audit plus the reviewers' checks in CI on a self-hosted GPU runner (matrix at most 12), with 0 tolerated tests;
+  - the furnace guards;
+  - a checked version pinned on the homepage with the audit JSON's sha.
+- **Pass tests:**
+  1. join error under 15 mm at 250 m inside the envelope;
+  2. pile feet within 0.05 m of the DTM at 10,000 feet;
+  3. top-down render against the satellite: IoU at least 0.10 above the dark-everywhere baseline, edge residual p50 under 1.0 m;
+  4. table overlaps 0 m2 and aisles under 1 m 0 (today 913 m2 and 27);
+  5. one engine import URL in the repo;
+  6. the GPU CI green in under 15 minutes;
+  7. 639 instances at 4K at least 90 fps, one draw call per LOD tier.
+- **You see:** a fenced construction site cut into the satellite, every table the one you approved, standing on measured ground, roads with their layers and quantities, and a CI page with the numbers.
+- **Cut if short:** in order, (a) the DSM-hillshade lock test, (b) the mat animation, (c) the fence animation.
+
+**Estimates:**
+
+| Plan | Agent-hours |
+|---|---|
+| Reviewer 1 | 48 (14 + 16 + 18) |
+| Reviewer 2 | 28 to 40 |
+| Lead | 11 |
+
+**Budget:** plan for two Fable builders per iteration with the GPU doing the checking. If the credit allows only one iteration, do iteration 1 whole.
+
+**Transformer unloading** (the lift plan and the station kernel) moves to the weekend after, unless iteration 3 finishes early.
