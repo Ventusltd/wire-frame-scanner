@@ -337,6 +337,23 @@ export const STRUCTURES = {
   whyItMatters: 'the foundation type changes the build: a pile rig and pull-out tests for driven posts or screws; lorry loads of concrete blocks, a crane or telehandler and no ground penetration for ballast (archaeology, landfill, cable easements)',
 };
 
+// ------------------------------------------------------------------------------------------------ machines and crews
+// The actors of the construction game, from the site photos. Each carries its footprint and its constraints so the
+// simulator can check that the work physically fits (aisles, ground, reach) before it animates it.
+export const PLANT = {
+  postDriver: {
+    sample: 'K (a UK grass site, drone view)',
+    machine: m('compact tracked excavator with a post-driving (rammer) attachment on the arm', '-', 'ESTIMATED', 'photo'),
+    workingPosition: m('sits in the aisle beside the row and drives each post in reach, then tracks along the aisle', '-', 'ESTIMATED', 'photo: track marks along the grass aisles'),
+    crew: m(['operator', 'one steadies and aligns the post', 'one checks line and level'], 'people', 'ESTIMATED', 'photo: three on foot plus the operator'),
+    trackWidth: m(null, '-', 'TO-SOURCE', 'track gauge and overall width, mass, reach and ground pressure from the machine maker'),
+    rate: m(null, '-', 'TO-SOURCE', 'posts per day per rig, from a contractor or a trade source'),
+    constraints: ['the aisle clear width fits the tracks plus a working clearance', 'the arm reaches the post line from the aisle', 'ground pressure within what the grass or soil carries (no road needed for tracked plant)'],
+  },
+  deliveries: m('wheeled lorries (modules, steel, transformers) need a road or mats; tracked plant can work on grass', '-', 'ESTIMATED', 'photos K and I; this is why the road kernel sizes roads for wheeled design vehicles'),
+  moduleCrew: m('two people lift and clamp each module', 'people', 'ESTIMATED', 'tracker photo (sample E)'),
+};
+
 // ------------------------------------------------------------------------------------------------ gates (every push)
 export const GATES = [
   { name: 'smoke', cmd: 'node tests/overlay-smoke.cjs', pass: '14 passed, 0 failed' },
@@ -479,9 +496,9 @@ if (import.meta.url === `file://${process.argv[1].replace(/\\/g, '/').replace(/^
   const gaps = []; let n = 0;
   const walk = (o, p) => { if (o && typeof o === 'object' && 'label' in o && 'unit' in o) { n++; for (const k of ['value', 'unit', 'label', 'source']) if (!(k in o)) gaps.push(`${p}.${k}`); if (o.value == null && o.label !== 'TO-SOURCE') gaps.push(`${p}: null value not TO-SOURCE`); return; }
     if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) walk(v, `${p}.${k}`); };
-  walk({ FACTS, AUDIT, KERNEL, REVIEWS, STRUCTURES, IT: ITERATIONS.map(i => i.agentHours) }, 'spec');
+  walk({ FACTS, AUDIT, KERNEL, REVIEWS, STRUCTURES, PLANT, IT: ITERATIONS.map(i => i.agentHours) }, 'spec');
   for (const it of ITERATIONS) for (const x of it.tests) for (const k of ['name', 'cmd', 'threshold']) if (!x[k]) gaps.push(`iteration ${it.id} test ${x.name}: ${k}`);
-  const toSource = JSON.stringify({ FACTS, KERNEL, REVIEWS, STRUCTURES }).match(/"TO-SOURCE"/g)?.length || 0;
+  const toSource = JSON.stringify({ FACTS, KERNEL, REVIEWS, STRUCTURES, PLANT }).match(/"TO-SOURCE"/g)?.length || 0;
   console.log(`${n} measurements, ${ITERATIONS.reduce((a, i) => a + i.tests.length, 0)} pass tests, ${FAULTS.length} faults, ${GATES.length} gates, ${toSource} TO-SOURCE items; gaps ${gaps.length}`);
   if (gaps.length) { console.log(gaps.join('\n')); process.exit(1); }
 }
