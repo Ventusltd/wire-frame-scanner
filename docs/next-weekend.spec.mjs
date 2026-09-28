@@ -261,7 +261,12 @@ export const STRUCTURES = {
     orientation: m('south-facing single face', '-', 'ESTIMATED', 'maker render'),
     modulesUpSlope: m(2, 'in portrait', 'ESTIMATED', 'maker render'),
     postsPerFrame: m(1, 'post', 'ESTIMATED', 'maker render'),
-    perMWp: m([219, 370], 'foundations per MWp (a frame every 3 modules; 760 W to 450 W modules)', 'DERIVED', 'foundationsPerMWp'),
+    modulesAlongPerBay: m([3, 4], 'modules between frames', 'ESTIMATED', 'back-view site photo: post rhythm along the row'),
+    purlins: m(4, 'purlins along the row (2 per module up-slope)', 'ESTIMATED', 'back-view site photo and maker render agree'),
+    strut: m('one diagonal from the post to the rafter', '-', 'ESTIMATED', 'back-view site photo and maker render agree'),
+    dcDrops: m('string cables drop from the module junction boxes down the post line to the ground', '-', 'ESTIMATED', 'back-view site photo; the kernel draws the drop at each post and the tie points along a purlin'),
+    ground: m('driven posts also work in gravel (brownfield) ground', '-', 'ESTIMATED', 'back-view site photo'),
+    perMWp: m([164, 370], 'foundations per MWp (a frame every 3 to 4 modules; 760 W to 450 W modules)', 'DERIVED', 'foundationsPerMWp'),
   },
   singleAxisTracker: {
     sample: 'E (a single-axis tracker photo, modules being mounted)',
