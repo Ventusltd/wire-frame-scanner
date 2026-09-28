@@ -321,6 +321,18 @@ export const STRUCTURES = {
     height: m('low and compact: posts about 1 m above ground, the ridge well under the REPD 6502 3.0 m', '-', 'ESTIMATED', 'close-up; to measure'),
     perimeter: m('a mesh security fence, a gravel track just inside it, and a wide meadow margin between the track and the table ends', '-', 'ESTIMATED', 'close-up; the fence-the-envelope phase builds these'),
   },
+  farmComparison: {
+    note: 'REPD 6502 (5 in portrait east + 5 in portrait west) against sample L (a larger E-W farm abroad, 5 in landscape per face); public figures from Wikipedia, 28 Sept 2026',
+    repd6502: m({ MWp: 373, bessMW: 150, panelHa: 360, mounting: 'fixed E-W', grid: '400 kV', built: 'Apr 2023 to Jul 2025', costGBPm: 450 }, 'mixed', 'DOCUMENTED', 'the English Wikipedia article on the farm'),
+    sampleL: m({ MWp: 605, phase2MWp: 45, modules: 1100000, km2: 5, ecologyKm2: 1.2, grid: 'extra-high voltage', built: 'Jun 2022 to Apr 2024', subsidy: 'none' }, 'mixed', 'DOCUMENTED', 'de.wikipedia.org (the park article)'),
+    density: m({ repd6502: 1.04, sampleL: 1.21 }, 'MWp per ha', 'DERIVED', '373/360 and 605/500'),
+    meanModuleKW: m({ sampleL: [0.550, 0.591] }, 'kW', 'DERIVED', '605 or 650 MWp over 1.1 million modules'),
+    modulesRepd6502: m([491000, 622000], 'modules', 'DERIVED', '373 MWp at 760 W or 600 W (module not published)'),
+    tableWidth: m({ repd6502: 24.27, sampleL: 13.49 }, 'm', 'DERIVED', 'tableAssembly'),
+    kWpPerMetreOfRow: m({ repd6502: 5.74, sampleL: 2.29 }, 'kWp/m', 'DERIVED', '10 modules across at 760 W over 1.323 m, against 10 across at 550 W over 2.404 m'),
+    piles: m({ repd6502: [98000, 124000], sampleL: [205000, 220000] }, 'piles', 'ESTIMATED', 'foundationsPerMWp: 6 posts per 3-module bay (REPD 6502), 4 posts per 2-module bay (sample L, read under the table)'),
+    drawnShare: m(0.58, 'of 373 MWp drawn today at 760 W (218 MWp)', 'DERIVED', 'the tables module does not yet draw every block'),
+  },
   terrainFollowing: {
     sample: 'J (a hillside site mid-build, bare beam-system frames)',
     rule: m('each frame sits on the ground at its own pile line, so a table curves along the row with the terrain', '-', 'ESTIMATED', 'hillside photo; the same rule as the site-world block-build (frame follows the ground per pile line)'),
