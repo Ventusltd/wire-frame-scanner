@@ -224,6 +224,55 @@ export const KERNEL = {
   },
 };
 
+// ------------------------------------------------------------------------------------------------ structure types
+// The table kernel is parametric over structure TYPE, not one table. Foundations per MWp follow from four numbers:
+//   foundations/MWp = postsPerFrame x 1000 / (modulesUpSlope x faces x modulesAlongPerBay x moduleKW)
+// Checked on the farm: 6 posts / (5 x 2 x 3 x 0.760 kW) = 263 per MWp against 269 counted table by table.
+export const foundationsPerMWp = ({ postsPerFrame, modulesUpSlope, faces = 1, modulesAlongPerBay, moduleKW }) =>
+  postsPerFrame * 1000 / (modulesUpSlope * faces * modulesAlongPerBay * moduleKW);
+export const STRUCTURES = {
+  eastWestTent: {
+    sample: 'C (the farm): two under-table site photos',
+    orientation: m('E-W tent, two faces back to back, ridge gap 0.5 m', '-', 'MEASURED', 'satellite rows and site photos'),
+    modulesUpSlope: m(5, 'in portrait per face', 'DERIVED', 'measured width 24.3 m'),
+    postsPerFrame: m(6, 'posts (3 per face)', 'ESTIMATED', 'site photos'),
+    modulesAlongPerBay: m(3, 'modules', 'ESTIMATED', 'site photos; range 2 to 4'),
+    foundation: m('driven galvanised post (the post is the pile)', '-', 'ESTIMATED', 'site photos'),
+    perMWp: m(263, 'foundations per MWp at 760 W', 'DERIVED', 'foundationsPerMWp; 136 to 399 over the ranges'),
+  },
+  southTwinPostBallast: {
+    sample: 'A (a 21 MWp site in a structure maker portfolio photo)',
+    orientation: m('south-facing single face', '-', 'ESTIMATED', 'portfolio photo'),
+    postsPerFrame: m(2, 'posts (short front, tall rear, one diagonal)', 'ESTIMATED', 'portfolio photo'),
+    modulesUpSlope: m(null, '-', 'TO-SOURCE', 'not resolved at the photo size; 2 in portrait or 4 in landscape are the usual reads'),
+    foundation: m('concrete ballast or footing blocks at the post feet', '-', 'ESTIMATED', 'dark blocks at the post feet in the photo'),
+    roughCount: m({ low: 12963, high: 19444, basis: '4 in landscape, 270 W class modules of that era, a frame every 2 to 3 modules' }, 'foundations for 21 MWp', 'ESTIMATED', 'foundationsPerMWp with ASSUMED module and bay; a rough guide only'),
+  },
+  southDrivenPosts: {
+    sample: 'B (an 18 MWp site in the same portfolio)',
+    orientation: m('south-facing single face, wide grassed aisles', '-', 'ESTIMATED', 'portfolio photo'),
+    postsPerFrame: m(2, 'posts (tall rear, front, diagonals)', 'ESTIMATED', 'portfolio photo'),
+    modulesUpSlope: m(null, '-', 'TO-SOURCE', 'not resolved at the photo size'),
+    foundation: m('driven posts into grassland', '-', 'ESTIMATED', 'portfolio photo'),
+    roughCount: m({ low: 11111, high: 16667, basis: 'same assumptions as sample A' }, 'piles for 18 MWp', 'ESTIMATED', 'foundationsPerMWp with ASSUMED module and bay; a rough guide only'),
+  },
+  southSinglePost: {
+    sample: 'D (a structure maker render, single post, 2 in portrait)',
+    orientation: m('south-facing single face', '-', 'ESTIMATED', 'maker render'),
+    modulesUpSlope: m(2, 'in portrait', 'ESTIMATED', 'maker render'),
+    postsPerFrame: m(1, 'post', 'ESTIMATED', 'maker render'),
+    perMWp: m([219, 370], 'foundations per MWp (a frame every 3 modules; 760 W to 450 W modules)', 'DERIVED', 'foundationsPerMWp'),
+  },
+  // The member topology every type shares, read most clearly from sample D and confirmed under the farm's tables:
+  // post (driven) -> rafter (inclined, one per frame per face) -> purlins (along the row, 2 per module in portrait,
+  // at the clamp zones) -> modules clamped to the purlins; a strut from the post foot to the rafter end; E-W tents
+  // add a second face and a ridge gap. Member sections and exact spacings stay TO-SOURCE (the maker drawing).
+  memberTopology: ['post', 'rafter per frame per face', 'strut post-foot to rafter end', 'purlins along the row, 2 per module up-slope', 'modules clamped to purlins', 'ridge gap (tent only)'],
+  purlinsPerFace: m({ farm: 10, sampleD: 4 }, 'purlins (2 per module up-slope)', 'ESTIMATED', 'maker render and site photos'),
+  kernelParameters: ['orientation (E-W tent | south single face)', 'modulesUpSlope and portrait/landscape', 'postsPerFrame (1 | 2 | 3 per face)', 'modulesAlongPerBay', 'foundation (driven post | ground screw | concrete ballast)', 'embedment or ballast mass', 'tilt, low edge, ridge'],
+  whyItMatters: 'the foundation type changes the build: a pile rig and pull-out tests for driven posts or screws; lorry loads of concrete blocks, a crane or telehandler and no ground penetration for ballast (archaeology, landfill, cable easements)',
+};
+
 // ------------------------------------------------------------------------------------------------ gates (every push)
 export const GATES = [
   { name: 'smoke', cmd: 'node tests/overlay-smoke.cjs', pass: '14 passed, 0 failed' },
@@ -366,9 +415,9 @@ if (import.meta.url === `file://${process.argv[1].replace(/\\/g, '/').replace(/^
   const gaps = []; let n = 0;
   const walk = (o, p) => { if (o && typeof o === 'object' && 'label' in o && 'unit' in o) { n++; for (const k of ['value', 'unit', 'label', 'source']) if (!(k in o)) gaps.push(`${p}.${k}`); if (o.value == null && o.label !== 'TO-SOURCE') gaps.push(`${p}: null value not TO-SOURCE`); return; }
     if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) walk(v, `${p}.${k}`); };
-  walk({ FACTS, AUDIT, KERNEL, REVIEWS, IT: ITERATIONS.map(i => i.agentHours) }, 'spec');
+  walk({ FACTS, AUDIT, KERNEL, REVIEWS, STRUCTURES, IT: ITERATIONS.map(i => i.agentHours) }, 'spec');
   for (const it of ITERATIONS) for (const x of it.tests) for (const k of ['name', 'cmd', 'threshold']) if (!x[k]) gaps.push(`iteration ${it.id} test ${x.name}: ${k}`);
-  const toSource = JSON.stringify({ FACTS, KERNEL, REVIEWS }).match(/"TO-SOURCE"/g)?.length || 0;
+  const toSource = JSON.stringify({ FACTS, KERNEL, REVIEWS, STRUCTURES }).match(/"TO-SOURCE"/g)?.length || 0;
   console.log(`${n} measurements, ${ITERATIONS.reduce((a, i) => a + i.tests.length, 0)} pass tests, ${FAULTS.length} faults, ${GATES.length} gates, ${toSource} TO-SOURCE items; gaps ${gaps.length}`);
   if (gaps.length) { console.log(gaps.join('\n')); process.exit(1); }
 }
