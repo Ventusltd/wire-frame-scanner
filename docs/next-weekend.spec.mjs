@@ -437,6 +437,19 @@ export const PLANT = {
   moduleCrew: m('two people lift and clamp each module', 'people', 'ESTIMATED', 'tracker photo (sample E)'),
 };
 
+// ------------------------------------------------------------------------------------------------ market feedback
+// 28 Sept, after the pinned version went out to an industry networking group: "If you could reference the latest
+// DNO/transmission guidance on infrastructure and proximity, that would help stop developer capacity issues."
+export const FEEDBACK = {
+  proximityAndCapacity: {
+    ask: m('show, on the map and in the walk, how close a design may come to grid infrastructure, and where capacity is', '-', 'DOCUMENTED', 'industry feedback, 28 Sept'),
+    layers: ['clearance zones around overhead lines by voltage (the 132 kV green and 400 kV blue lines already drawn)', 'easement and wayleave corridors', 'substation and cable-route stand-offs', 'DNO and transmission capacity where published'],
+    sources: m(['HSE GS6 (avoiding danger from overhead power lines)', 'ENA TS 43-8 (overhead line clearances)', 'the transmission owner guidance on development near overhead lines', 'DNO embedded capacity registers and network capacity maps'], '-', 'TO-SOURCE', 'to read and cite by number and clause, never copy; the latest editions to confirm'),
+    ties: m('the overhead-line safety priority and the construction game: plant and cranes near lines get a visible exclusion zone', '-', 'DERIVED', 'direction record'),
+    when: m('the weekend after next, with trenches and roads; the kernel exports line positions now', '-', 'ASSUMED', 'the agreed plan order'),
+  },
+};
+
 // ------------------------------------------------------------------------------------------------ gates (every push)
 export const GATES = [
   { name: 'smoke', cmd: 'node tests/overlay-smoke.cjs', pass: '14 passed, 0 failed' },
@@ -578,7 +591,7 @@ if (import.meta.url === `file://${process.argv[1].replace(/\\/g, '/').replace(/^
   const gaps = []; let n = 0;
   const walk = (o, p) => { if (o && typeof o === 'object' && 'label' in o && 'unit' in o) { n++; for (const k of ['value', 'unit', 'label', 'source']) if (!(k in o)) gaps.push(`${p}.${k}`); if (o.value == null && o.label !== 'TO-SOURCE') gaps.push(`${p}: null value not TO-SOURCE`); return; }
     if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) walk(v, `${p}.${k}`); };
-  walk({ FACTS, AUDIT, KERNEL, REVIEWS, STRUCTURES, PLANT, IT: ITERATIONS.map(i => i.agentHours) }, 'spec');
+  walk({ FACTS, AUDIT, KERNEL, REVIEWS, STRUCTURES, PLANT, FEEDBACK, IT: ITERATIONS.map(i => i.agentHours) }, 'spec');
   for (const it of ITERATIONS) for (const x of it.tests) for (const k of ['name', 'cmd', 'threshold']) if (!x[k]) gaps.push(`iteration ${it.id} test ${x.name}: ${k}`);
   const toSource = JSON.stringify({ FACTS, KERNEL, REVIEWS, STRUCTURES, PLANT }).match(/"TO-SOURCE"/g)?.length || 0;
   console.log(`${n} measurements, ${ITERATIONS.reduce((a, i) => a + i.tests.length, 0)} pass tests, ${FAULTS.length} faults, ${GATES.length} gates, ${toSource} TO-SOURCE items; gaps ${gaps.length}`);
