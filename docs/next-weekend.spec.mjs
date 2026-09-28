@@ -285,10 +285,21 @@ export const STRUCTURES = {
     perMWp: m([164, 263], 'foundations per MWp (5 to 8 modules per bay, 760 W)', 'DERIVED', 'foundationsPerMWp with faces 1 and modulesUpSlope 1; 188 at 7 modules'),
     buildStep: m('two people lift each module onto the torque tube and clamp it at chest height; the rows then turn', '-', 'ESTIMATED', 'photo; the simulator animates the mounting and the rotation'),
   },
+  southTwinPostBeams: {
+    sample: 'F (a maker twin-post system photographed mid-build, bare steel)',
+    orientation: m('south-facing single face', '-', 'ESTIMATED', 'mid-build photo'),
+    postsPerFrame: m(2, 'posts (tall rear line, short front line)', 'ESTIMATED', 'mid-build photo'),
+    topology: m('posts -> a longitudinal beam along each post line at the post heads -> rafters up the slope resting on both beams, overhanging the rear -> modules (purlins not yet fitted in the photo)', '-', 'ESTIMATED', 'mid-build photo; a second topology the kernel must support'),
+    rafterSpacing: m(null, '-', 'TO-SOURCE', 'about the post spacing or closer in the photo; the maker drawing gives it'),
+    buildStageSeen: m('after rafters, before purlins and modules', '-', 'MEASURED', 'what the photo shows'),
+  },
+  // THE BUILD SEQUENCE the construction game animates, from the site photos (each step a typed command and a state):
+  buildSequence: ['set out the rows (survey)', 'drive posts (or place ballast blocks, or screw in ground screws)', 'fix longitudinal beams (beam systems) or rafters on the post heads', 'fix rafters on the beams (beam systems)', 'fix purlins along the row', 'clamp modules (a two-person lift, as in the tracker photo)', 'tie string cables along a purlin and drop them at the posts', 'set the inverter (under the table, or on its own stand at the row end)', 'dig the LV AC trench from the inverter and lay ducts and cables'],
   // The member topology every type shares, read most clearly from sample D and confirmed under the farm's tables:
   // post (driven) -> rafter (inclined, one per frame per face) -> purlins (along the row, 2 per module in portrait,
   // at the clamp zones) -> modules clamped to the purlins; a strut from the post foot to the rafter end; E-W tents
   // add a second face and a ridge gap. Member sections and exact spacings stay TO-SOURCE (the maker drawing).
+  memberTopologyBeamVariant: ['post', 'longitudinal beam per post line', 'rafters up the slope on the beams', 'purlins (if used)', 'modules'],
   memberTopology: ['post', 'rafter per frame per face', 'strut post-foot to rafter end', 'purlins along the row, 2 per module up-slope', 'modules clamped to purlins', 'ridge gap (tent only)'],
   purlinsPerFace: m({ farm: 10, sampleD: 4 }, 'purlins (2 per module up-slope)', 'ESTIMATED', 'maker render and site photos'),
   kernelParameters: ['orientation (E-W tent | south single face | single-axis tracker)', 'modulesUpSlope and portrait/landscape', 'postsPerFrame (1 | 2 | 3 per face)', 'modulesAlongPerBay', 'foundation (driven post | ground screw | concrete ballast)', 'embedment or ballast mass', 'tilt, low edge, ridge'],
