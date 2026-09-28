@@ -359,6 +359,52 @@ export const STRUCTURES = {
   whyItMatters: 'the foundation type changes the build: a pile rig and pull-out tests for driven posts or screws; lorry loads of concrete blocks, a crane or telehandler and no ground penetration for ballast (archaeology, landfill, cable easements)',
 };
 
+// ------------------------------------------------------------------------------------------------ the table as code
+// "We are just changing the orientation, landscape or portrait, and how many per row; basic shapes around modules,
+// impact piles or screw piles, and their height adjustable from the LiDAR." Yes: every structure sample above is this
+// one function with different numbers. groundAt(x, y) is the EA DTM in the table frame (x across, y along the row).
+const D2R = Math.PI / 180;
+export function tableAssembly(p, groundAt = () => 0) {
+  const { module: [mLong, mShort], orientation, upSlope, along, faces, tilt, lowEdge, bayModules, postLinesPerFace,
+    foundation, ridgeGap = 0.5, gap = 0.02, follow = 'straight', reveal = [0.6, 3.5] } = p;
+  const up = orientation === 'portrait' ? mLong : mShort, alongW = orientation === 'portrait' ? mShort : mLong;
+  const faceRun = upSlope * (up + gap) - gap, faceW = faceRun * Math.cos(tilt * D2R), rise = faceRun * Math.sin(tilt * D2R);
+  const length = along * (alongW + gap) - gap, width = faces === 2 ? 2 * faceW + ridgeGap : faceW;
+  const bay = bayModules * (alongW + gap), nFrames = Math.floor(length / bay + 1e-9) + 1;
+  const lines = [];                                      // post lines across the table: 10 % to 90 % of each face
+  for (let f = 0; f < faces; f++) for (let k = 0; k < postLinesPerFace; k++) {
+    const t = postLinesPerFace === 1 ? 0.5 : 0.1 + 0.8 * k / (postLinesPerFace - 1), xf = t * faceW;
+    lines.push({ x: faces === 2 ? (f ? width / 2 - xf : -width / 2 + xf) : -faceW / 2 + xf, h: lowEdge + t * rise });
+  }
+  const ys = Array.from({ length: nFrames }, (_, i) => Math.min(i * bay, length));
+  // the table's design line along the row: STRAIGHT = least-squares line through the ground under the frames, lifted
+  // so every post keeps at least its design height; FOLLOW = each frame sits on its own ground (terrain following)
+  const gMean = ys.map(y => lines.reduce((a, L) => a + groundAt(L.x, y), 0) / lines.length);
+  let line;
+  if (follow === 'straight') {
+    const n = ys.length, my = ys.reduce((a, b) => a + b, 0) / n, mg = gMean.reduce((a, b) => a + b, 0) / n;
+    const k = ys.reduce((a, y, i) => a + (y - my) * (gMean[i] - mg), 0) / (ys.reduce((a, y) => a + (y - my) ** 2, 0) || 1);
+    const base = y => mg + k * (y - my);
+    const lift = Math.max(0, ...ys.flatMap(y => lines.map(L => groundAt(L.x, y) - base(y))));
+    line = y => base(y) + lift;
+  } else line = y => gMean[ys.indexOf(y)];
+  const piles = [];
+  for (const y of ys) for (const L of lines) {
+    const g = groundAt(L.x, y), top = line(y) + L.h;
+    piles.push({ x: +L.x.toFixed(3), y: +y.toFixed(3), ground: +g.toFixed(3), reveal: +(top - g).toFixed(3) });
+  }
+  const rv = piles.map(q => q.reveal), out = piles.filter(q => q.reveal < reveal[0] || q.reveal > reveal[1]).length;
+  return { dims: { width: +width.toFixed(3), length: +length.toFixed(3), faceWidth: +faceW.toFixed(3), lowEdge, highEdge: +(lowEdge + rise).toFixed(3) },
+    counts: { modules: upSlope * faces * along, frames: nFrames, piles: piles.length }, foundation,
+    reveal: { min: Math.min(...rv), max: Math.max(...rv), outOfRange: out }, piles };
+}
+export const TABLE_EXAMPLES = {
+  farmTent5P: { module: [2.384, 1.303], orientation: 'portrait', upSlope: 5, along: 90, faces: 2, tilt: 8, lowEdge: 1.33, bayModules: 3, postLinesPerFace: 3, foundation: 'impact-driven post' },
+  landscapeTent5L: { module: [2.384, 1.303], orientation: 'landscape', upSlope: 5, along: 40, faces: 2, tilt: 10, lowEdge: 0.9, bayModules: 2, postLinesPerFace: 2, foundation: 'impact-driven post' },
+  southSinglePost2P: { module: [2.384, 1.303], orientation: 'portrait', upSlope: 2, along: 30, faces: 1, tilt: 20, lowEdge: 0.8, bayModules: 3, postLinesPerFace: 1, foundation: 'screw pile', reveal: [0.8, 2.5] },
+  farmTent5PFollow: { module: [2.384, 1.303], orientation: 'portrait', upSlope: 5, along: 90, faces: 2, tilt: 8, lowEdge: 1.33, bayModules: 3, postLinesPerFace: 3, foundation: 'impact-driven post', follow: 'follow' },
+};
+
 // ------------------------------------------------------------------------------------------------ machines and crews
 // The actors of the construction game, from the site photos. Each carries its footprint and its constraints so the
 // simulator can check that the work physically fits (aisles, ground, reach) before it animates it.
@@ -522,5 +568,10 @@ if (import.meta.url === `file://${process.argv[1].replace(/\\/g, '/').replace(/^
   for (const it of ITERATIONS) for (const x of it.tests) for (const k of ['name', 'cmd', 'threshold']) if (!x[k]) gaps.push(`iteration ${it.id} test ${x.name}: ${k}`);
   const toSource = JSON.stringify({ FACTS, KERNEL, REVIEWS, STRUCTURES, PLANT }).match(/"TO-SOURCE"/g)?.length || 0;
   console.log(`${n} measurements, ${ITERATIONS.reduce((a, i) => a + i.tests.length, 0)} pass tests, ${FAULTS.length} faults, ${GATES.length} gates, ${toSource} TO-SOURCE items; gaps ${gaps.length}`);
+  const slope = (x, y) => 0.03 * y + 0.4 * Math.sin(y / 15) + 0.01 * x;      // 3 % along the row, a 0.4 m swell, 1 % across
+  for (const [k, pr] of Object.entries(TABLE_EXAMPLES)) for (const [gn, g] of [['flat', () => 0], ['sloping', slope]]) {
+    const r = tableAssembly(pr, g); console.log(`${k} on ${gn} ground: ${r.dims.width} x ${r.dims.length} m, ${r.counts.modules} modules, ${r.counts.frames} frames, ${r.counts.piles} ${r.foundation}s, reveal ${r.reveal.min} to ${r.reveal.max} m (${r.reveal.outOfRange} out of range)`);
+    if (!(r.counts.piles > 0) || (k.startsWith('farmTent5P') && Math.abs(r.dims.width - 24.27) > 0.05)) gaps.push(`table example ${k} ${gn}`);
+  }
   if (gaps.length) { console.log(gaps.join('\n')); process.exit(1); }
 }
