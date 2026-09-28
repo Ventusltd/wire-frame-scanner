@@ -201,6 +201,10 @@ export const KERNEL = {
     members: ['cut in the DTM', 'walls or batters', 'bedding sand', 'ducts (swept tubes)', 'cables inside', 'cover', 'warning tape', 'backfill layers', 'spoil heap'],
     rule: 'plan bends are arcs with R >= the governing radius (the duct); the audit bend test is the gate',
   },
+  perimeter: {
+    members: ['security fence (mesh on posts, about 2 m; deer fence on farmland)', 'gates', 'perimeter track just inside the fence', 'meadow or grazing margin between the track and the table ends'],
+    dims: m(null, '-', 'TO-SOURCE', 'fence height and post spacing, track width, margin width from the planning drawings; about 2 m, 3 m and 8 to 12 m read from a close-up photo'),
+  },
   road: {
     vehicles: {
       moduleLorry: m({ gross_t: 44, type: 'articulated HGV' }, 'mixed', 'TO-SOURCE', 'UK maximum gross weight is 44 t; axle loads and swept path from a manufacturer'),
@@ -308,6 +312,9 @@ export const STRUCTURES = {
     modulesUpSlope: m(null, '-', 'TO-SOURCE', 'landscape modules per face: about 4 to 6 read from the photo, to count on a sharper image'),
     faceWidth: m('modulesUpSlope x module short side (1.13 to 1.30 m) x cos(tilt)', '-', 'DERIVED', 'the same kernel as the portrait tent with the module turned; about half the REPD 6502 width'),
     stationsBetweenTables: m('small kiosks set in gaps between the tables', '-', 'ESTIMATED', 'drone photo'),
+    tentFrame: m('an A-frame: two rafters meeting at the ridge, a horizontal tie low across the A, posts under each face, C-section purlins along the row', '-', 'ESTIMATED', 'close-up of the table ends; the tent topology for the kernel'),
+    height: m('low and compact: posts about 1 m above ground, the ridge well under the REPD 6502 3.0 m', '-', 'ESTIMATED', 'close-up; to measure'),
+    perimeter: m('a mesh security fence, a gravel track just inside it, and a wide meadow margin between the track and the table ends', '-', 'ESTIMATED', 'close-up; the fence-the-envelope phase builds these'),
   },
   terrainFollowing: {
     sample: 'J (a hillside site mid-build, bare beam-system frames)',
