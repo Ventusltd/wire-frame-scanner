@@ -306,6 +306,16 @@ export const STRUCTURES = {
     perMWp: m([439, 1111], 'foundations per MWp (3 to 2 modules per bay; 760 W to 450 W)', 'DERIVED', 'foundationsPerMWp with 2 posts, 2 up-slope'),
     stateSeen: m('half built: frames complete, half the modules clamped', '-', 'MEASURED', 'what the render shows; the being-built state the game draws'),
   },
+  southSinglePostConcrete: {
+    sample: 'H (a single-post bifacial table from behind, dry stony ground)',
+    orientation: m('south-facing single face', '-', 'ESTIMATED', 'site photo'),
+    modulesUpSlope: m(2, 'in portrait, bifacial', 'ESTIMATED', 'site photo'),
+    postsPerFrame: m(1, 'tall rear post with a diagonal from its foot up to the rafter', 'ESTIMATED', 'site photo'),
+    modulesAlongPerBay: m(3, 'modules between frames', 'ESTIMATED', 'site photo'),
+    foundation: m('post set in a small cast concrete footing', '-', 'ESTIMATED', 'site photo: the fourth foundation type, where rock or stones stop a driven post'),
+    setOut: m('string lines on the ground mark the post lines before driving or casting', '-', 'ESTIMATED', 'site photo; the survey step of the build sequence draws them'),
+    perMWp: m([219, 370], 'foundations per MWp (3 modules per bay; 760 W to 450 W)', 'DERIVED', 'foundationsPerMWp with 1 post, 2 up-slope'),
+  },
   // The member topology every type shares, read most clearly from sample D and confirmed under the farm's tables:
   // post (driven) -> rafter (inclined, one per frame per face) -> purlins (along the row, 2 per module in portrait,
   // at the clamp zones) -> modules clamped to the purlins; a strut from the post foot to the rafter end; E-W tents
@@ -313,7 +323,7 @@ export const STRUCTURES = {
   memberTopologyBeamVariant: ['post', 'longitudinal beam per post line', 'rafters up the slope on the beams', 'purlins (if used)', 'modules'],
   memberTopology: ['post', 'rafter per frame per face', 'strut post-foot to rafter end', 'purlins along the row, 2 per module up-slope', 'modules clamped to purlins', 'ridge gap (tent only)'],
   purlinsPerFace: m({ farm: 10, sampleD: 4 }, 'purlins (2 per module up-slope)', 'ESTIMATED', 'maker render and site photos'),
-  kernelParameters: ['orientation (E-W tent | south single face | single-axis tracker)', 'modulesUpSlope and portrait/landscape', 'postsPerFrame (1 | 2 | 3 per face)', 'modulesAlongPerBay', 'foundation (driven post | ground screw | concrete ballast)', 'embedment or ballast mass', 'tilt, low edge, ridge'],
+  kernelParameters: ['orientation (E-W tent | south single face | single-axis tracker)', 'modulesUpSlope and portrait/landscape', 'postsPerFrame (1 | 2 | 3 per face)', 'modulesAlongPerBay', 'foundation (driven post | ground screw | concrete ballast | cast concrete footing)', 'embedment or ballast mass', 'tilt, low edge, ridge'],
   whyItMatters: 'the foundation type changes the build: a pile rig and pull-out tests for driven posts or screws; lorry loads of concrete blocks, a crane or telehandler and no ground penetration for ballast (archaeology, landfill, cable easements)',
 };
 
