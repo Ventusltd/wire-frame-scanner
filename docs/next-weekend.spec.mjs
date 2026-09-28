@@ -450,6 +450,33 @@ export const FEEDBACK = {
   },
 };
 
+// ------------------------------------------------------------------------------------------------ THE TIGHT SCOPE
+// 28 Sept, at 3 % credit, after the Fable critic (about 40 % as written, about 65 % with the two machine jobs first and
+// iteration 3 deferred). This block overrides the ITERATIONS order where they differ. Ventus Ltd is a cable company:
+// the kernel's cable quantities are the commercial point, so they are in scope as the stretch.
+export const TIGHT = {
+  order: [
+    'A. machine job: bake the EA 1 m DTM for the REPD 6502 R5 tiles into Terrarium tiles z14-17 (CuPy + NumPy witness, R5 pacing), serve locally, use as map terrain where covered',
+    'B. spike, scratch copy only: MapLibre 5, pitch beyond 90 in Walk, custom layers intact, fps; a one-page go or no-go',
+    'C. five safe fixes: loader t.async = false; FORMATS accept 5P and 5L east-west; walk about 10 m/s, run 33; find box visible; phone captions under 25 %',
+    'D. one ground: wire grounded per vertex on the baked terrain',
+    'E. one table kernel lifted from tableAssembly: tracker 1P/2P branch, presets, interfaces (inverter, homeRuns, piles, widths); FARM and block() deleted',
+    'F. Kuiper string chooser ported (20-case test) and the series check (30 accepted, 31 refused at 1,500 V)',
+    'G. the layout dashboard writes typed lines and redraws the farm as plain solids',
+    'H. stretch: a cable schedule from the kernel (DC string metres, strings per inverter, AC home-run estimate), labelled ESTIMATED',
+  ],
+  hours: m({ A: [4, 6], B: [1, 2], C: [4, 6], D: [3, 4], E: [6, 9], F: [2, 3], G: [5, 7], H: [2, 3] }, 'agent-hours', 'ESTIMATED', 'lead, after the critic: 27 to 40 h in all; the 24 h cap holds only with A run as a script and H dropped'),
+  deferred: ['iteration 3 (hero look, envelope, GPU CI)', 'MapLibre 5 on main (after the spike)', 'trench, roads, mats, fence, lift', 'proximity and capacity layer', 'homepage pin change'],
+  done: [
+    'one ground: wire vs map terrain <= 0.05 m at 1,000 points',
+    'kernel: 48-way matrix builds; REPD 6502 preset reconciles with station.mjs to 1 mm',
+    'series: 30 accepted and 31 refused with the numbers on screen',
+    'dashboard: each preset writes its typed line and the farm redraws; four structures differ > 5 % of pixels in plan',
+    'baseline: smoke 14/14, blank VISIBLE, 4K >= 90 fps, phone >= 60 fps, 0 page errors, privacy scan clean, audit rerun',
+  ],
+  firstCommands: ['git clone https://github.com/Ventusltd/wire-frame-scanner && node docs/next-weekend.spec.mjs', 'git clone https://github.com/Ventusltd/energy-transition-simulator && node tests/overlay-smoke.cjs', 'python audit/geometry_audit.py --repo <simulator clone> --out <folder>'],
+};
+
 // ------------------------------------------------------------------------------------------------ gates (every push)
 export const GATES = [
   { name: 'smoke', cmd: 'node tests/overlay-smoke.cjs', pass: '14 passed, 0 failed' },
@@ -591,7 +618,7 @@ if (import.meta.url === `file://${process.argv[1].replace(/\\/g, '/').replace(/^
   const gaps = []; let n = 0;
   const walk = (o, p) => { if (o && typeof o === 'object' && 'label' in o && 'unit' in o) { n++; for (const k of ['value', 'unit', 'label', 'source']) if (!(k in o)) gaps.push(`${p}.${k}`); if (o.value == null && o.label !== 'TO-SOURCE') gaps.push(`${p}: null value not TO-SOURCE`); return; }
     if (o && typeof o === 'object') for (const [k, v] of Object.entries(o)) walk(v, `${p}.${k}`); };
-  walk({ FACTS, AUDIT, KERNEL, REVIEWS, STRUCTURES, PLANT, FEEDBACK, IT: ITERATIONS.map(i => i.agentHours) }, 'spec');
+  walk({ FACTS, AUDIT, KERNEL, REVIEWS, STRUCTURES, PLANT, FEEDBACK, TIGHT, IT: ITERATIONS.map(i => i.agentHours) }, 'spec');
   for (const it of ITERATIONS) for (const x of it.tests) for (const k of ['name', 'cmd', 'threshold']) if (!x[k]) gaps.push(`iteration ${it.id} test ${x.name}: ${k}`);
   const toSource = JSON.stringify({ FACTS, KERNEL, REVIEWS, STRUCTURES, PLANT }).match(/"TO-SOURCE"/g)?.length || 0;
   console.log(`${n} measurements, ${ITERATIONS.reduce((a, i) => a + i.tests.length, 0)} pass tests, ${FAULTS.length} faults, ${GATES.length} gates, ${toSource} TO-SOURCE items; gaps ${gaps.length}`);

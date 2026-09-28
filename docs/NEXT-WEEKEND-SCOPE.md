@@ -467,3 +467,33 @@ Sold once item 9 is taken as written above (plain solids in iteration 1, hero lo
 - ESTIMATED: tube height 1.7 m (1P). ASSUMED: 2.3 m (2P).
 - walk-fps.js today: WALK 1.4, RUN 6, PMAX 85 (round 1 notes); the direction's values replace them in iteration 2.
 
+## 14. THE TIGHT SCOPE (28 Sept, 3 % credit; overrides section 13's order where they differ)
+
+**Why tighten.** A Fable critic judged the sold plan about 40 % likely to get the wireframe working in one weekend. The two hardest jobs had no hours: serving the EA terrain as map tiles, and freeing the camera. With those two done first by the machine and iteration 3 deferred, it judged the chance about 65 %.
+
+**The order:**
+- **A.** Bake the terrain tiles (a script).
+- **B.** A one-page MapLibre 5 spike, in a scratch copy only.
+- **C.** Five safe fixes.
+- **D.** One ground.
+- **E.** One table kernel lifted from tableAssembly.
+- **F.** The Kuiper chooser and the series check.
+- **G.** The layout dashboard.
+- **H.** Stretch: a cable schedule from the kernel. The owner is a cable company, so the quantities are the commercial point.
+
+**Deferred:**
+- iteration 3;
+- MapLibre 5 on main;
+- trenches, roads, mats, fence and lift;
+- the proximity and capacity layer;
+- any homepage pin change.
+
+**Done means:**
+- one ground at or under 0.05 m;
+- the 48-way kernel matrix builds, and the REPD 6502 preset reconciles to 1 mm;
+- 30 in series accepted and 31 refused;
+- the dashboard redraws the farm;
+- the baseline gates are green, and the audit has been rerun.
+
+**Cost.** The honest estimate is 27 to 40 agent-hours. The 24 h cap holds only if A runs as a script and H is dropped. The machine-readable version is `TIGHT` in docs/next-weekend.spec.mjs.
+
