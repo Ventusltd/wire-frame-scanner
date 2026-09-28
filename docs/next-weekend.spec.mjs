@@ -290,7 +290,10 @@ export const STRUCTURES = {
     orientation: m('south-facing single face', '-', 'ESTIMATED', 'mid-build photo'),
     postsPerFrame: m(2, 'posts (tall rear line, short front line)', 'ESTIMATED', 'mid-build photo'),
     topology: m('posts -> a longitudinal beam along each post line at the post heads -> rafters up the slope resting on both beams, overhanging the rear -> modules (purlins not yet fitted in the photo)', '-', 'ESTIMATED', 'mid-build photo; a second topology the kernel must support'),
-    rafterSpacing: m(null, '-', 'TO-SOURCE', 'about the post spacing or closer in the photo; the maker drawing gives it'),
+    rafterSpacing: m('about 2 rafters per post bay (half the post spacing)', '-', 'ESTIMATED', 'second mid-build photo (sample I); the maker drawing gives the exact value'),
+    sections: m('slotted C-section beams, lipped C-section rafters', '-', 'ESTIMATED', 'second mid-build photo'),
+    postFeet: m('a ring of crushed stone around each post foot (a pre-drilled hole backfilled, or a gravel collar)', '-', 'ESTIMATED', 'second mid-build photo; to confirm on site'),
+    siteTrack: m('an unpaved construction track with tyre ruts along the array edge', '-', 'ESTIMATED', 'second mid-build photo; the temporary access the road kernel compares with a built road or mats'),
     buildStageSeen: m('after rafters, before purlins and modules', '-', 'MEASURED', 'what the photo shows'),
   },
   // THE BUILD SEQUENCE the construction game animates, from the site photos (each step a typed command and a state):
