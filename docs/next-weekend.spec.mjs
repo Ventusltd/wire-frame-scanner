@@ -295,6 +295,17 @@ export const STRUCTURES = {
   },
   // THE BUILD SEQUENCE the construction game animates, from the site photos (each step a typed command and a state):
   buildSequence: ['set out the rows (survey)', 'drive posts (or place ballast blocks, or screw in ground screws)', 'fix longitudinal beams (beam systems) or rafters on the post heads', 'fix rafters on the beams (beam systems)', 'fix purlins along the row', 'clamp modules (a two-person lift, as in the tracker photo)', 'tie string cables along a purlin and drop them at the posts', 'set the inverter (under the table, or on its own stand at the row end)', 'dig the LV AC trench from the inverter and lay ducts and cables'],
+  southTwinPostRafters: {
+    sample: 'G (a maker render of a twin-post 2P section, half fitted with modules)',
+    orientation: m('south-facing single face', '-', 'ESTIMATED', 'maker render'),
+    modulesUpSlope: m(2, 'in portrait', 'ESTIMATED', 'maker render'),
+    postsPerFrame: m(2, 'posts (short front, tall rear) and one diagonal from the rear post to the rafter', 'ESTIMATED', 'maker render'),
+    modulesAlongPerBay: m([2, 3], 'modules between frames', 'ESTIMATED', 'maker render: 3 frames over about 6 module widths'),
+    purlins: m(4, 'purlins along the row with module clamps', 'ESTIMATED', 'maker render'),
+    postJoint: m('two-part post: a pile in the ground with the post spliced on above it', '-', 'ESTIMATED', 'maker render; changes the build (pile first, post after, levelled at the splice)'),
+    perMWp: m([439, 1111], 'foundations per MWp (3 to 2 modules per bay; 760 W to 450 W)', 'DERIVED', 'foundationsPerMWp with 2 posts, 2 up-slope'),
+    stateSeen: m('half built: frames complete, half the modules clamped', '-', 'MEASURED', 'what the render shows; the being-built state the game draws'),
+  },
   // The member topology every type shares, read most clearly from sample D and confirmed under the farm's tables:
   // post (driven) -> rafter (inclined, one per frame per face) -> purlins (along the row, 2 per module in portrait,
   // at the clamp zones) -> modules clamped to the purlins; a strut from the post foot to the rafter end; E-W tents
